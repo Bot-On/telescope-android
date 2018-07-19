@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import com.b4motion.geolocation.core.GeoB4
 import com.b4motion.geolocation.globals.log
+import com.facebook.stetho.Stetho
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                 log("que no tienes permisos!!!!")
             }
         }
+        Stetho.initializeWithDefaults(this)
     }
 
     private fun hasPermissions(): Boolean {

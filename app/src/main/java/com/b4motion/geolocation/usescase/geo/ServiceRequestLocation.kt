@@ -11,6 +11,8 @@ import android.os.IBinder
 import android.os.Looper
 import android.support.v4.app.NotificationCompat
 import android.telephony.TelephonyManager
+import android.util.Log
+import com.b4motion.data.Repository
 import com.b4motion.data.storage.preferences.PREF_IMEI
 import com.b4motion.data.storage.preferences.PreferenceHelper
 import com.b4motion.domain.db.PositionDb
@@ -20,6 +22,7 @@ import com.b4motion.geolocation.globals.buildNotificationChanel
 import com.b4motion.geolocation.globals.log
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
+import io.reactivex.disposables.CompositeDisposable
 import org.jetbrains.anko.doAsync
 
 
@@ -30,7 +33,10 @@ class ServiceRequestLocation : Service() {
         const val SMALL_DISPLACEMENT: Float = 5f
     }
 
+    private val disposable: CompositeDisposable = CompositeDisposable()
+
     private lateinit var locationRequest: LocationRequest
+    private lateinit var position: PositionDb
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -66,10 +72,23 @@ class ServiceRequestLocation : Service() {
     }
 
     private fun onLocationChanged(location: Location) {
+        position = PositionDb(System.currentTimeMillis(), Repository.getDeviceId(this), location.latitude, location.longitude)
+        //position = PositionDb(System.currentTimeMillis(), "1a8d9325-0c21-4460-aa8e-e4f2424f9697", location.latitude, location.longitude)
         doAsync {
-            GeoB4.getInstance().database.poistionDao().insertPosition(PositionDb(System.currentTimeMillis(), location.latitude, location.longitude))
+            GeoB4.getInstance().database.poistionDao().insertPosition(position)
+            disposable.add(
+                    Repository.sendGPSData(position)
+                            .subscribe({deletePosition()}, {Log.d("Error", "Error")})
+            )
+
             GeoB4.getInstance().database.poistionDao().getAllPositionsAsc().forEach { log("time ${it.timestamp}", "ASC") }
             GeoB4.getInstance().database.poistionDao().getAllPositionsDesc().forEach { log("time ${it.timestamp}", "DESC") }
+        }
+    }
+
+    private fun deletePosition() {
+        doAsync {
+            GeoB4.getInstance().database.poistionDao().delete(position)
         }
     }
 
@@ -122,4 +141,8 @@ class ServiceRequestLocation : Service() {
     }
     //endregion
 
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable.dispose()
+    }
 }
