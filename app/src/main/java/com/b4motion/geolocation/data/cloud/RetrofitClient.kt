@@ -1,8 +1,6 @@
-package com.b4motion.data.cloud
+package com.b4motion.geolocation.data.cloud
 
-import android.content.Context
-import com.b4motion.geolocation.BuildConfig
-import io.reactivex.android.plugins.RxAndroidPlugins
+import com.b4motion.geolocation.geolocation.BuildConfig
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient

@@ -1,7 +1,7 @@
-package com.b4motion.data.storage
+package com.b4motion.geolocation.data.storage
 
 import android.arch.persistence.room.*
-import com.b4motion.domain.db.PositionDb
+import com.b4motion.geolocation.domain.db.PositionDb
 
 @Dao
 interface PositionDao {

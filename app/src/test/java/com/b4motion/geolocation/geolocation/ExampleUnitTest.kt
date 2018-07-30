@@ -1,4 +1,4 @@
-package com.b4motion.geolocation
+package com.b4motion.geolocation.geolocation
 
 import org.junit.Test
 

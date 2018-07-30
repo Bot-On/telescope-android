@@ -1,7 +1,6 @@
-package com.b4motion.data.cloud
+package com.b4motion.geolocation.data.cloud
 
-import android.content.Context
-import com.b4motion.domain.db.PositionDb
+import com.b4motion.geolocation.domain.db.PositionDb
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

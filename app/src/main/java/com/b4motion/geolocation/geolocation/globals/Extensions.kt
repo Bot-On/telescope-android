@@ -1,4 +1,4 @@
-package com.b4motion.geolocation.globals
+package com.b4motion.geolocation.geolocation.globals
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -6,8 +6,8 @@ import android.content.Context
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.Log
-import com.b4motion.geolocation.BuildConfig
-import com.b4motion.geolocation.R
+import com.b4motion.geolocation.geolocation.BuildConfig
+import com.b4motion.geolocation.geolocation.R
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun Context.buildNotificationChanel(): String {

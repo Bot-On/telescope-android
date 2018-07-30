@@ -1,9 +1,7 @@
-package com.b4motion.data.cloud
+package com.b4motion.geolocation.data.cloud
 
-import com.b4motion.domain.db.PositionDb
+import com.b4motion.geolocation.domain.db.PositionDb
 import io.reactivex.Completable
-import io.reactivex.Single
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 

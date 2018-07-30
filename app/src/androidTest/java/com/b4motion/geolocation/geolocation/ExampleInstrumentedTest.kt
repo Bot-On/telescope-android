@@ -1,4 +1,4 @@
-package com.b4motion.geolocation
+package com.b4motion.geolocation.geolocation
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4

@@ -1,10 +1,10 @@
-package com.b4motion.data
+package com.b4motion.geolocation.data
 
 import android.content.Context
-import com.b4motion.data.cloud.ConnectionManager
-import com.b4motion.data.storage.preferences.PREF_DEVICE_ID
-import com.b4motion.data.storage.preferences.PreferenceHelper
-import com.b4motion.domain.db.PositionDb
+import com.b4motion.geolocation.data.storage.preferences.PREF_DEVICE_ID
+import com.b4motion.geolocation.data.storage.preferences.PreferenceHelper
+import com.b4motion.geolocation.domain.db.PositionDb
+import com.b4motion.geolocation.data.cloud.ConnectionManager
 import io.reactivex.Completable
 
 /**
