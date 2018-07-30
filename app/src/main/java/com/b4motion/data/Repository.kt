@@ -2,12 +2,10 @@ package com.b4motion.data
 
 import android.content.Context
 import com.b4motion.data.cloud.ConnectionManager
-import com.b4motion.data.storage.preferences.PREF_IMEI
+import com.b4motion.data.storage.preferences.PREF_DEVICE_ID
 import com.b4motion.data.storage.preferences.PreferenceHelper
 import com.b4motion.domain.db.PositionDb
 import io.reactivex.Completable
-
-import com.b4motion.data.storage.preferences.PREF_IMEI
 
 /**
  * Created by frodriguez on 7/18/2018.
@@ -19,7 +17,7 @@ class Repository {
 
         //STORAGE
         fun getDeviceId(context: Context) : String {
-            return PreferenceHelper<String>(context, PREF_IMEI).getPreference("")
+            return PreferenceHelper<String>(context, PREF_DEVICE_ID).getPreference("")
         }
 
         //CLOUD

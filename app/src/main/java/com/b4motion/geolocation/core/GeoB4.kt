@@ -34,10 +34,12 @@ class GeoB4 {
      *
      * @throws SecurityException if ACCESS_FINE_LOCATION and READ_PHONE_STATE permissions aren't given
      */
-    fun init(context: Context) {
+    fun init(context: Context, deviceId: String) {
         database = Room.databaseBuilder(context, GeoDatabase::class.java, "b4_geo_database").fallbackToDestructiveMigration().build()
         if (hasPermissions(context)) {
-            context.startService(Intent(context, ServiceRequestLocation::class.java))
+            val intent = Intent(context, ServiceRequestLocation::class.java)
+            intent.putExtra("DeviceId", deviceId)
+            context.startService(intent)
         } else
             throw(SecurityException())
     }

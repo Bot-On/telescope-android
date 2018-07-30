@@ -8,21 +8,25 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import com.b4motion.geolocation.core.GeoB4
 import com.b4motion.geolocation.globals.log
-import com.facebook.stetho.Stetho
 
 class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private var deviceId : String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+    }
+
+    fun init(deviceId: String){
+        this.deviceId = deviceId
         if (hasPermissions()) {
             try {
-                GeoB4.getInstance().init(applicationContext)
+                GeoB4.getInstance().init(applicationContext, deviceId)
             } catch (e: SecurityException) {
                 log("que no tienes permisos!!!!")
             }
         }
-        Stetho.initializeWithDefaults(this)
     }
 
     private fun hasPermissions(): Boolean {
@@ -49,7 +53,7 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         //If ask is commig from share fragment,then continue there
         if (grantResults.isNotEmpty() && grantResults.none { it == PackageManager.PERMISSION_DENIED }) {
-            GeoB4.getInstance().init(applicationContext)
+            init(deviceId)
         }
     }
 }
