@@ -1,4 +1,4 @@
-package com.b4motion.data.storage.preferences
+package com.b4motion.geolocation.data.storage.preferences
 
 import android.content.Context
 import android.content.SharedPreferences

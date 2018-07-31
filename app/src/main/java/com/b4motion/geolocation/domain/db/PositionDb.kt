@@ -1,4 +1,4 @@
-package com.b4motion.domain.db
+package com.b4motion.geolocation.domain.db
 
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity

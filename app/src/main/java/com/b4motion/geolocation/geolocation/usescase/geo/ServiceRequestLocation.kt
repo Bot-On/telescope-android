@@ -1,25 +1,22 @@
-package com.b4motion.geolocation.usescase.geo
+package com.b4motion.geolocation.geolocation.usescase.geo
 
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.support.v4.app.NotificationCompat
-import android.telephony.TelephonyManager
-import android.util.Log
-import com.b4motion.data.Repository
-import com.b4motion.data.storage.preferences.PREF_IMEI
-import com.b4motion.data.storage.preferences.PreferenceHelper
-import com.b4motion.domain.db.PositionDb
-import com.b4motion.geolocation.R
-import com.b4motion.geolocation.core.GeoB4
-import com.b4motion.geolocation.globals.buildNotificationChanel
-import com.b4motion.geolocation.globals.log
+import com.b4motion.geolocation.data.Repository
+import com.b4motion.geolocation.data.storage.preferences.PREF_DEVICE_ID
+import com.b4motion.geolocation.data.storage.preferences.PreferenceHelper
+import com.b4motion.geolocation.domain.db.PositionDb
+import com.b4motion.geolocation.geolocation.R
+import com.b4motion.geolocation.geolocation.core.GeoB4
+import com.b4motion.geolocation.geolocation.globals.buildNotificationChanel
+import com.b4motion.geolocation.geolocation.globals.log
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
 import io.reactivex.disposables.CompositeDisposable
@@ -41,7 +38,8 @@ class ServiceRequestLocation : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        saveImei()
+        val deviceId = intent?.getStringExtra("DeviceId") ?: ""
+        saveDeviceID(deviceId)
 
         val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             buildNotificationChanel()
@@ -73,12 +71,11 @@ class ServiceRequestLocation : Service() {
 
     private fun onLocationChanged(location: Location) {
         position = PositionDb(System.currentTimeMillis(), Repository.getDeviceId(this), location.latitude, location.longitude)
-        //position = PositionDb(System.currentTimeMillis(), "1a8d9325-0c21-4460-aa8e-e4f2424f9697", location.latitude, location.longitude)
         doAsync {
             GeoB4.getInstance().database.poistionDao().insertPosition(position)
             disposable.add(
                     Repository.sendGPSData(position)
-                            .subscribe({deletePosition()}, {Log.d("Error", "Error")})
+                            .subscribe({deletePosition()}, { log("Error", "GeoLocation") })
             )
 
             GeoB4.getInstance().database.poistionDao().getAllPositionsAsc().forEach { log("time ${it.timestamp}", "ASC") }
@@ -112,16 +109,9 @@ class ServiceRequestLocation : Service() {
         }, Looper.myLooper())
     }
 
-    @SuppressLint("MissingPermission")
-    private fun saveImei() {
-        var tm: TelephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
-            PreferenceHelper<String>(this@ServiceRequestLocation, PREF_IMEI).setPreference(tm.deviceId)
-            log(tm.deviceId)
-        } else {
-            PreferenceHelper<String>(this@ServiceRequestLocation, PREF_IMEI).setPreference(tm.imei)
-            log(tm.imei)
-        }
+
+    private fun saveDeviceID(deviceId: String) {
+            PreferenceHelper<String>(this@ServiceRequestLocation, PREF_DEVICE_ID).setPreference(deviceId)
     }
 
     //------------ NOTIFICATION ---------------------

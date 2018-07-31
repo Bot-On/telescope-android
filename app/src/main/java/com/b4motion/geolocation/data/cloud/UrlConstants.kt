@@ -1,6 +1,4 @@
-package com.b4motion.data.cloud
-
-import android.os.Build
+package com.b4motion.geolocation.data.cloud
 
 /**
  * Created by frodriguez on 7/18/2018.
