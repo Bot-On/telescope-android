@@ -6,6 +6,9 @@ import android.content.Context
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.Log
+import com.b4motion.geolocation.domain.db.PositionDb
+import com.b4motion.geolocation.domain.model.PositionFeedGPS
+import com.b4motion.geolocation.domain.model.RequestFeedGPS
 import com.b4motion.geolocation.geolocation.BuildConfig
 import com.b4motion.geolocation.geolocation.R
 
@@ -22,3 +25,7 @@ fun log(text: String, tag: String = "GeoB4") {
     if (BuildConfig.DEBUG)
         Log.d(tag, text)
 }
+
+fun MutableList<PositionDb>.toRequestFeedGPS() = RequestFeedGPS(this[0].deviceId, this.map {
+    PositionFeedGPS(it.timestamp.toDouble(), it.latitude, it.longitude, it.altitude)
+} as MutableList<PositionFeedGPS>)

@@ -17,6 +17,7 @@ import com.b4motion.geolocation.geolocation.R
 import com.b4motion.geolocation.geolocation.core.GeoB4
 import com.b4motion.geolocation.geolocation.globals.buildNotificationChanel
 import com.b4motion.geolocation.geolocation.globals.log
+import com.b4motion.geolocation.geolocation.globals.toRequestFeedGPS
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
 import io.reactivex.disposables.CompositeDisposable
@@ -70,16 +71,16 @@ class ServiceRequestLocation : Service() {
     }
 
     private fun onLocationChanged(location: Location) {
-        position = PositionDb(System.currentTimeMillis(), Repository.getDeviceId(this), location.latitude, location.longitude)
+        position = PositionDb(System.currentTimeMillis(), Repository.getDeviceId(this),
+                location.latitude,
+                location.longitude,
+                location.altitude)
         doAsync {
             GeoB4.getInstance().database.poistionDao().insertPosition(position)
             disposable.add(
-                    Repository.sendGPSData(position)
-                            .subscribe({deletePosition()}, { log("Error", "GeoLocation") })
+                    Repository.sendGPSData(GeoB4.getInstance().database.poistionDao().getAllPositionsAsc().toRequestFeedGPS())
+                            .subscribe({ deletePosition() }, { log("Error", "GeoLocation") })
             )
-
-            GeoB4.getInstance().database.poistionDao().getAllPositionsAsc().forEach { log("time ${it.timestamp}", "ASC") }
-            GeoB4.getInstance().database.poistionDao().getAllPositionsDesc().forEach { log("time ${it.timestamp}", "DESC") }
         }
     }
 

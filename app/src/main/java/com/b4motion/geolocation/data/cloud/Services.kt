@@ -1,6 +1,7 @@
 package com.b4motion.geolocation.data.cloud
 
 import com.b4motion.geolocation.domain.db.PositionDb
+import com.b4motion.geolocation.domain.model.RequestFeedGPS
 import io.reactivex.Completable
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -16,5 +17,5 @@ interface Services {
     }
 
     @POST(UrlConstants.DATA_FEEDS_GPS)
-    fun sendGPSData(@Body position: PositionDb): Completable
+    fun sendGPSData(@Body position: RequestFeedGPS): Completable
 }
