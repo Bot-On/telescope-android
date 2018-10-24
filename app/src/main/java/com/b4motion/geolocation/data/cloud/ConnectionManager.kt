@@ -21,5 +21,21 @@ class ConnectionManager {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
         }
+
+        fun getDeviceId(imei : String) : Completable {
+            return RetrofitClient.getClient()
+                    .create(Services::class.java)
+                    .getDeviceId(imei)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+        }
+
+        fun createDevice(imei : String) : Completable {
+            return RetrofitClient.getClient()
+                    .create(Services::class.java)
+                    .createDevice(imei)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+        }
     }
 }

@@ -6,22 +6,29 @@ import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import com.b4motion.geolocation.data.Repository
 import com.b4motion.geolocation.geolocation.globals.log
+import io.reactivex.disposables.CompositeDisposable
+import retrofit2.HttpException
 
 /**
  * Created by frodriguez on 7/30/2018.
  *
  */
-class GeoLocation constructor(private val activity: AppCompatActivity){
+class GeoLocation constructor(private val activity: AppCompatActivity) {
+    private val disposable: CompositeDisposable = CompositeDisposable()
+    private var imei: String = ""
 
-    fun init(deviceId: String){
+    fun init(deviceId: String) {
         checkPermissions()
         try {
-            GeoB4.getInstance().init(activity, deviceId)
+            imei = deviceId
+            getDeviceId()
         } catch (e: SecurityException) {
             log("que no tienes permisos!!!!")
         }
     }
+
 
     private fun checkPermissions() {
         var permissions = mutableListOf<String>()
@@ -45,4 +52,28 @@ class GeoLocation constructor(private val activity: AppCompatActivity){
             ActivityCompat.requestPermissions(activity, permissionsToRequest, 0)
     }
 
+    //------------ CLOUD ---------------------
+    //region CLOUD
+    private fun getDeviceId() {
+        disposable.add(Repository.getDeviceId(imei).subscribe({ intitGeoB4("") }, { handleError(it) }))
+    }
+
+    private fun createDeviceId() {
+        disposable.add(Repository.createDevice(imei).subscribe({ intitGeoB4("") }, { handleError(it) }))
+    }
+
+    private fun intitGeoB4(deviceId: String) {
+        GeoB4.getInstance().init(activity, deviceId)
+    }
+
+    private fun handleError(cause: Throwable?) {
+        when (cause) {
+            is HttpException -> {
+                if (cause.code() == 404) {
+                    createDeviceId()
+                }
+            }
+        }
+    }
+    //endregion
 }

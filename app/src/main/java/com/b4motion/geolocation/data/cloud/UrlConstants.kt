@@ -11,5 +11,6 @@ class UrlConstants {
         const val VERSION = "v1/"
 
         const val DATA_FEEDS_GPS = VERSION + "data_feeds/gps"
+        const val DEVICES = VERSION + "devices"
     }
 }

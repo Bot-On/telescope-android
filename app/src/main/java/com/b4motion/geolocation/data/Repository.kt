@@ -22,6 +22,14 @@ class Repository {
         }
 
         //CLOUD
+        fun getDeviceId(imei : String) : Completable{
+            return ConnectionManager.getDeviceId(imei)
+        }
+
+        fun createDevice(imei : String) : Completable{
+            return ConnectionManager.createDevice(imei)
+        }
+
         fun sendGPSData(position: RequestFeedGPS) : Completable {
             return ConnectionManager.sendGPSData(position)
         }
