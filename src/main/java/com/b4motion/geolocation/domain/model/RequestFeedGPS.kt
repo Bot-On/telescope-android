@@ -6,4 +6,4 @@ package com.b4motion.geolocation.domain.model
  * QUADRAM MOBILE SOLUTIONS
  * jcamarero@quadram.mobi
  */
-data class RequestFeedGPS(var device_id : String, var batch : MutableList<PositionFeedGPS>)
+data class RequestFeedGPS(var mobile_id : String, var batch : MutableList<PositionFeedGPS>)

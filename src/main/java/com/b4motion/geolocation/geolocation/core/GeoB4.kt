@@ -6,7 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
+import com.b4motion.geolocation.data.cloud.ConnectionManager
 import com.b4motion.geolocation.data.storage.GeoDatabase
+import com.b4motion.geolocation.geolocation.globals.extensions.getTelescopeInfo
 import com.b4motion.geolocation.geolocation.usescase.geo.ServiceRequestLocation
 
 class GeoB4 {
@@ -37,6 +39,7 @@ class GeoB4 {
     fun init(context: Context, deviceId: String) {
         database = Room.databaseBuilder(context, GeoDatabase::class.java, "b4_geo_database").fallbackToDestructiveMigration().build()
         if (hasPermissions(context)) {
+            ConnectionManager.initRetrofitClient(context.applicationContext.getTelescopeInfo())
             val intent = Intent(context, ServiceRequestLocation::class.java)
             intent.putExtra("DeviceId", deviceId)
             context.startService(intent)

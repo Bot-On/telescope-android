@@ -1,5 +1,6 @@
 package com.b4motion.geolocation.data.cloud
 
+import com.b4motion.geolocation.domain.model.Telescope
 import com.b4motion.geolocation.geolocation.BuildConfig
 import okhttp3.Credentials
 import okhttp3.Interceptor
@@ -19,14 +20,14 @@ class RetrofitClient {
 
         private var retrofit: Retrofit? = null
 
-        fun getClient(): Retrofit {
+        fun getClient(telescope: Telescope): Retrofit {
             if(retrofit == null){
                 val interceptorLogHeaders = HttpLoggingInterceptor()
                 val interceptorLogBody = HttpLoggingInterceptor()
                 val headersInterceptor = Interceptor { chain ->
                     val request = chain.request()?.newBuilder()?.
                             addHeader("Accept", "application/json")?.
-                            addHeader("Authorization", Credentials.basic("gps@theboton.io","xdmT7v1yfdwgbeQN"))?.
+                            addHeader("Authorization", Credentials.basic(telescope.username,telescope.password))?.
                             build()
                     chain.proceed(request)
                 }
@@ -41,7 +42,7 @@ class RetrofitClient {
                         .build()
 
                 retrofit = Retrofit.Builder()
-                        .baseUrl(BuildConfig.URL_BASE)
+                        .baseUrl(telescope.url)
                         .client(client)
                         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                         .addConverterFactory(GsonConverterFactory.create())

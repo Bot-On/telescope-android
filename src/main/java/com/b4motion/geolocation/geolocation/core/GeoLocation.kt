@@ -1,12 +1,11 @@
 package com.b4motion.geolocation.geolocation.core
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import com.b4motion.geolocation.geolocation.globals.log
+import com.b4motion.geolocation.geolocation.globals.extensions.log
 
 /**
  * Created by frodriguez on 7/30/2018.
