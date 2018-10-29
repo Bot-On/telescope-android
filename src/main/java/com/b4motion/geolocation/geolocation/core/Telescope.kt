@@ -22,7 +22,7 @@ class Telescope {
 
         private var telescope: Telescope? = null
 
-        fun getInstance(activity: AppCompatActivity, imei : String): Telescope {
+        @JvmStatic fun getInstance(activity: AppCompatActivity, imei : String): Telescope {
             if (telescope == null) {
                 if (checkPermissions(activity)) {
                     ConnectionManager.initRetrofitClient(activity.applicationContext.getTelescopeInfo())
@@ -34,7 +34,7 @@ class Telescope {
         }
 
 
-        fun stopTracking(activity: AppCompatActivity){
+        @JvmStatic fun stopTracking(activity: AppCompatActivity){
             activity.applicationContext.stopService(Intent(activity, ServiceRequestLocation::class.java))
         }
 
