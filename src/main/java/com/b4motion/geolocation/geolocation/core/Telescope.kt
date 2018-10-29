@@ -34,6 +34,14 @@ class Telescope {
             return telescope ?: getInstance(activity, imei)
         }
 
+        @JvmStatic
+        fun restartTracking(activity: AppCompatActivity) {
+            if (telescope != null)
+                activity.applicationContext.startService(Intent(activity, ServiceRequestLocation::class.java))
+            else
+                throw Exception("you have to call Telescope.getInstance(activity, imei) first")
+        }
+
 
         @JvmStatic
         fun stopTracking(activity: AppCompatActivity) {
