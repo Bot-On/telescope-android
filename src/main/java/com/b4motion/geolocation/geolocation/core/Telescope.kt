@@ -22,7 +22,8 @@ class Telescope {
 
         private var telescope: Telescope? = null
 
-        @JvmStatic fun getInstance(activity: AppCompatActivity, imei : String): Telescope {
+        @JvmStatic
+        fun getInstance(activity: AppCompatActivity, imei: String): Telescope {
             if (telescope == null) {
                 if (checkPermissions(activity)) {
                     ConnectionManager.initRetrofitClient(activity.applicationContext.getTelescopeInfo())
@@ -30,11 +31,12 @@ class Telescope {
                     telescope = Telescope()
                 }
             }
-            return telescope!!
+            return telescope ?: getInstance(activity, imei)
         }
 
 
-        @JvmStatic fun stopTracking(activity: AppCompatActivity){
+        @JvmStatic
+        fun stopTracking(activity: AppCompatActivity) {
             activity.applicationContext.stopService(Intent(activity, ServiceRequestLocation::class.java))
         }
 
@@ -45,8 +47,8 @@ class Telescope {
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                 permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
 
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
-                permissions.add(Manifest.permission.CALL_PHONE)
+            /*if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)
+                permissions.add(Manifest.permission.CALL_PHONE)*/
 
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
                 permissions.add(Manifest.permission.READ_PHONE_STATE)
