@@ -21,6 +21,7 @@ class Telescope {
     companion object {
 
         private var telescope: Telescope? = null
+        private var isRunning: Boolean = false
 
         @JvmStatic
         fun getInstance(activity: AppCompatActivity, imei: String): Telescope {
@@ -28,6 +29,7 @@ class Telescope {
                 if (checkPermissions(activity)) {
                     ConnectionManager.initRetrofitClient(activity.applicationContext.getTelescopeInfo())
                     GeoLocation(activity).init(imei)
+                    isRunning = true
                     telescope = Telescope()
                 }
             }
@@ -36,9 +38,10 @@ class Telescope {
 
         @JvmStatic
         fun restartTracking(activity: AppCompatActivity) {
-            if (telescope != null)
+            if (telescope != null) {
                 activity.applicationContext.startService(Intent(activity, ServiceRequestLocation::class.java))
-            else
+                isRunning = true
+            } else
                 throw Exception("you have to call Telescope.getInstance(activity, imei) first")
         }
 
@@ -46,7 +49,11 @@ class Telescope {
         @JvmStatic
         fun stopTracking(activity: AppCompatActivity) {
             activity.applicationContext.stopService(Intent(activity, ServiceRequestLocation::class.java))
+            isRunning = false
         }
+
+        @JvmStatic
+        fun isRunning() = isRunning
 
 
         private fun checkPermissions(activity: AppCompatActivity): Boolean {
