@@ -18,6 +18,7 @@ import retrofit2.HttpException
 
 import com.b4motion.geolocation.geolocation.globals.extensions.log
 import io.reactivex.Single
+import retrofit2.Response
 
 
 /**
@@ -43,12 +44,15 @@ class GeoLocation constructor(val activity: AppCompatActivity) {
     private fun getDeviceId() {
         var type = ""
         disposable.add(Repository.getDeviceId(imei).subscribe({
-            startTracking(it.data.firstOrNull { device -> device.attributes.imei == imei }?.apply { type = attributes.type }?.id, type)
+            if (it.data.size > 0)
+                startTracking(it.data.firstOrNull { device -> device.attributes.imei == imei }?.apply { type = attributes.type }?.id, type)
+            else
+                createDeviceId()
         }, { handleError(it) }))
     }
 
     private fun createDeviceId() {
-        disposable.add(Repository.createDevice(imei).subscribe({ startTracking("", "") }, { handleError(it) }))
+        disposable.add(Repository.createDevice(imei).subscribe({ startTracking(it.data.id, it.data.attributes.type) }, { }))
     }
 
     private fun startTracking(mobileId: String?, type: String) {

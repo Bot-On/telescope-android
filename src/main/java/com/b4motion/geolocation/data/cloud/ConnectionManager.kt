@@ -40,10 +40,10 @@ class ConnectionManager {
                     .observeOn(AndroidSchedulers.mainThread())
         }
 
-        fun createDevice(mobile_id : String) : Completable {
+        fun createDevice(imei : String) : Single<TelescopeResponse<Device>> {
             return retrofit
                     .create(Services::class.java)
-                    .createDevice(mobile_id)
+                    .createDevice(imei)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
         }

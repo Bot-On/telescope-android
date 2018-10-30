@@ -37,8 +37,8 @@ class Repository {
             return ConnectionManager.getDeviceId(mobile_id)
         }
 
-        fun createDevice(mobile_id: String): Completable {
-            return ConnectionManager.createDevice(mobile_id)
+        fun createDevice(imei: String): Single<TelescopeResponse<Device>> {
+            return ConnectionManager.createDevice(imei)
         }
 
         fun sendGPSData(position: RequestFeedGPS): Completable {

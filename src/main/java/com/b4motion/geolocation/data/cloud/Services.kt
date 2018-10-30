@@ -15,11 +15,11 @@ import retrofit2.http.*
 interface Services {
 
     @GET(UrlConstants.DEVICES)
-    fun getDeviceId(@Query("mobile_id") mobile_id: String): Single<TelescopeResponse<MutableList<Device>>>
+    fun getDeviceId(@Query("query[imei]") mobile_id: String): Single<TelescopeResponse<MutableList<Device>>>
 
     @FormUrlEncoded
     @POST(UrlConstants.DEVICES)
-    fun createDevice(@Field("mobile_id") imei: String, @Field("type") type: String = "phone"): Completable
+    fun createDevice(@Field("imei") imei: String, @Field("type") type: String = "phone"): Single<TelescopeResponse<Device>>
 
     @POST(UrlConstants.DATA_FEEDS_GPS)
     fun sendGPSData(@Body position: RequestFeedGPS): Completable
