@@ -28,7 +28,7 @@ class Telescope {
             if (telescope == null) {
                 if (checkPermissions(activity)) {
                     ConnectionManager.initRetrofitClient(activity.applicationContext.getTelescopeInfo())
-                    GeoLocation(activity).init(imei)
+                    GeoB4.getInstance().init(activity, imei)
                     isRunning = true
                     telescope = Telescope()
                 }

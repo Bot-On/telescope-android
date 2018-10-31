@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
+import com.b4motion.geolocation.data.Repository
 import com.b4motion.geolocation.data.cloud.ConnectionManager
 import com.b4motion.geolocation.data.storage.GeoDatabase
 import com.b4motion.geolocation.geolocation.globals.extensions.getTelescopeInfo
@@ -36,10 +38,11 @@ class GeoB4 {
      *
      * @throws SecurityException if ACCESS_FINE_LOCATION and READ_PHONE_STATE permissions aren't given
      */
-    fun init(context: Context) {
-        database = Room.databaseBuilder(context, GeoDatabase::class.java, "b4_geo_database").fallbackToDestructiveMigration().build()
-        if (hasPermissions(context)) {
-            context.startService(Intent(context, ServiceRequestLocation::class.java))
+    fun init(activity: AppCompatActivity, mobileId: String) {
+        database = Room.databaseBuilder(activity, GeoDatabase::class.java, "b4_geo_database").fallbackToDestructiveMigration().build()
+        if (hasPermissions(activity)) {
+            Repository.setMobileId(activity, mobileId)
+            activity.startService(Intent(activity, ServiceRequestLocation::class.java))
         } else
             throw(SecurityException())
     }

@@ -28,10 +28,6 @@ class Repository {
             PreferenceHelper<String>(context, PREF_MOBILE_ID).setPreference(moileId)
         }
 
-        fun setDeviceType(context: Context, type: String) {
-            PreferenceHelper<String>(context, PREF_DEVICE_TYPE).setPreference(type)
-        }
-
         //CLOUD
         fun getDeviceId(mobile_id: String): Single<TelescopeResponse<MutableList<Device>>> {
             return ConnectionManager.getDeviceId(mobile_id)
