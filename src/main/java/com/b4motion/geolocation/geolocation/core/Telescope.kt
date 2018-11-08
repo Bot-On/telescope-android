@@ -6,9 +6,13 @@ import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.b4motion.geolocation.data.cloud.ConnectionManager
 import com.b4motion.geolocation.geolocation.globals.extensions.getTelescopeInfo
 import com.b4motion.geolocation.geolocation.usescase.geo.ServiceRequestLocation
+import com.b4motion.geolocation.geolocation.usescase.geo.WorkerLocation
+import java.util.concurrent.CountDownLatch
 
 
 /**
@@ -22,6 +26,8 @@ class Telescope {
 
         private var telescope: Telescope? = null
         private var isRunning: Boolean = false
+        var locationWait = CountDownLatch(1)
+
 
         @JvmStatic
         fun getInstance(activity: AppCompatActivity, imei: String): Telescope {
@@ -39,7 +45,13 @@ class Telescope {
         @JvmStatic
         fun restartTracking(activity: AppCompatActivity) {
             if (telescope != null) {
-                activity.applicationContext.startService(Intent(activity, ServiceRequestLocation::class.java))
+                val workerLocation =
+                        OneTimeWorkRequest.Builder(WorkerLocation::class.java)
+
+
+                workerLocation.addTag("workerLocation")
+
+                WorkManager.getInstance().enqueue(workerLocation.build())
                 isRunning = true
             } else
                 throw Exception("you have to call Telescope.getInstance(activity, imei) first")
@@ -48,8 +60,10 @@ class Telescope {
 
         @JvmStatic
         fun stopTracking(activity: AppCompatActivity) {
-            activity.applicationContext.stopService(Intent(activity, ServiceRequestLocation::class.java))
+            //activity.applicationContext.stopService(Intent(activity, ServiceRequestLocation::class.java))
             isRunning = false
+
+            locationWait.countDown()
         }
 
         @JvmStatic

@@ -7,11 +7,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import androidx.work.Constraints
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import com.b4motion.geolocation.data.Repository
-import com.b4motion.geolocation.data.cloud.ConnectionManager
 import com.b4motion.geolocation.data.storage.GeoDatabase
-import com.b4motion.geolocation.geolocation.globals.extensions.getTelescopeInfo
 import com.b4motion.geolocation.geolocation.usescase.geo.ServiceRequestLocation
+import com.b4motion.geolocation.geolocation.usescase.geo.WorkerLocation
+import java.util.concurrent.TimeUnit
 
 class GeoB4 {
     lateinit var database: GeoDatabase
@@ -42,7 +46,16 @@ class GeoB4 {
         database = Room.databaseBuilder(activity, GeoDatabase::class.java, "b4_geo_database").fallbackToDestructiveMigration().build()
         if (hasPermissions(activity)) {
             Repository.setMobileId(activity, mobileId)
-            activity.startService(Intent(activity, ServiceRequestLocation::class.java))
+            //activity.startService(Intent(activity, ServiceRequestLocation::class.java))
+
+            val workerLocation =
+                    OneTimeWorkRequest.Builder(WorkerLocation::class.java)
+
+
+            workerLocation.addTag("workerLocation")
+
+            WorkManager.getInstance().enqueue(workerLocation.build())
+
         } else
             throw(SecurityException())
     }

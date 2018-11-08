@@ -9,4 +9,6 @@ package com.b4motion.geolocation.domain.model
 data class PositionFeedGPS(val timestamp: Double,
                            val latitude: Double,
                            val longitude: Double,
-                           val altitude: Double)
+                           val altitude: Double,
+                           val bearing: Double,
+                           val speed: Double)

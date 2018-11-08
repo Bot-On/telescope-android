@@ -70,7 +70,11 @@ class ServiceRequestLocation : Service() {
         position = PositionDb(System.currentTimeMillis(), Repository.getMobileId(this),
                 location.latitude,
                 location.longitude,
-                location.altitude)
+                location.altitude,
+                location.bearing.toDouble(),
+                location.speed.toDouble())
+
+
         doAsync {
             GeoB4.getInstance().database.poistionDao().insertPosition(position)
             disposable.add(

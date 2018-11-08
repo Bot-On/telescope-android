@@ -12,4 +12,6 @@ data class PositionDb(@PrimaryKey(autoGenerate = true) @ColumnInfo(name = "times
                       @ColumnInfo(name = "device_id") var deviceId: String = "",
                       @ColumnInfo(name = "latitude") var latitude: Double = 0.0,
                       @ColumnInfo(name = "longitude") var longitude: Double = 0.0,
-                      @ColumnInfo(name = "altitude") var altitude: Double = 0.0)
+                      @ColumnInfo(name = "altitude") var altitude: Double = 0.0,
+                      @ColumnInfo(name = "bearing") var bearing: Double = 0.0,
+                      @ColumnInfo(name = "speed") var speed: Double = 0.0)
