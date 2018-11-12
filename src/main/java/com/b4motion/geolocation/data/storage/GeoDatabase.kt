@@ -4,7 +4,7 @@ import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
 import com.b4motion.geolocation.domain.db.PositionDb
 
-@Database(entities = arrayOf(PositionDb::class), version = 3, exportSchema = false)
+@Database(entities = arrayOf(PositionDb::class), version = 4, exportSchema = false)
 abstract class GeoDatabase : RoomDatabase() {
 
     abstract fun poistionDao(): PositionDao

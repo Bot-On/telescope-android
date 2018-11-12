@@ -10,8 +10,10 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.b4motion.geolocation.data.cloud.ConnectionManager
 import com.b4motion.geolocation.geolocation.globals.extensions.getTelescopeInfo
+import com.b4motion.geolocation.geolocation.globals.extensions.log
 import com.b4motion.geolocation.geolocation.usescase.geo.ServiceRequestLocation
 import com.b4motion.geolocation.geolocation.usescase.geo.WorkerLocation
+import com.facebook.stetho.Stetho
 import java.util.concurrent.CountDownLatch
 
 
@@ -39,12 +41,16 @@ class Telescope {
                     telescope = Telescope()
                 }
             }
+            Stetho.initializeWithDefaults(activity)
             return telescope ?: getInstance(activity, imei)
         }
 
         @JvmStatic
         fun restartTracking(activity: AppCompatActivity) {
             if (telescope != null) {
+
+                locationWait = CountDownLatch(1)
+
                 val workerLocation =
                         OneTimeWorkRequest.Builder(WorkerLocation::class.java)
 
@@ -52,6 +58,8 @@ class Telescope {
                 workerLocation.addTag("workerLocation")
 
                 WorkManager.getInstance().enqueue(workerLocation.build())
+
+                log("restarting tracking")
                 isRunning = true
             } else
                 throw Exception("you have to call Telescope.getInstance(activity, imei) first")

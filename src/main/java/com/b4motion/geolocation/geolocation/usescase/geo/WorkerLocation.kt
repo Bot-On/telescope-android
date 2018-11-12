@@ -2,6 +2,7 @@ package com.b4motion.geolocation.geolocation.usescase.geo
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Location
 import android.os.HandlerThread
 import android.os.Looper
 import androidx.work.Worker
@@ -26,12 +27,13 @@ import java.util.concurrent.CountDownLatch
 class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     companion object {
         const val LOCATION_REFRESH_TIME = 5000L
-        const val LOCATION_REFRESH_DISTANCE = 0.1f
+        const val LOCATION_REFRESH_DISTANCE = 1f
     }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val disposable: CompositeDisposable = CompositeDisposable()
     private lateinit var locationCallback: LocationCallback
+    private var lastLocationSaved: Location? = null
 
 
     //------------ WORKER METHODS ---------------------
@@ -57,7 +59,9 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
 
     override fun onStopped(cancelled: Boolean) {
         super.onStopped(cancelled)
+        log("on stop work location")
         disposable.dispose()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
     //endregion
 
@@ -67,22 +71,22 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult?) {
                 super.onLocationResult(p0)
-                log("positionreceived")
+                log("positionreceived ${p0?.lastLocation?.latitude} : ${p0?.lastLocation?.longitude} : ${p0?.lastLocation?.time}")
                 if (p0 != null) {
-                    val lastLocation = p0.lastLocation
-                    val position = PositionDb(System.currentTimeMillis(), Repository.getMobileId(context),
-                            lastLocation.latitude,
-                            lastLocation.longitude,
-                            lastLocation.altitude,
-                            lastLocation.bearing.toDouble(),
-                            lastLocation.speed.toDouble())
-
-                    sendLocations(position)
-
+                        val lastLocation = p0.lastLocation
+                        val position = PositionDb(System.currentTimeMillis(), Repository.getMobileId(context),
+                                lastLocation.latitude,
+                                lastLocation.longitude,
+                                lastLocation.altitude,
+                                lastLocation.bearing.toDouble(),
+                                lastLocation.speed.toDouble())
+                        log("send position")
+                        sendLocations(position)
+                    }
                 }
             }
         }
-    }
+
 
     private fun sendLocations(position: PositionDb) {
         doAsync {

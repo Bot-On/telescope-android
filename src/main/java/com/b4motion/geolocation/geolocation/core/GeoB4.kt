@@ -7,12 +7,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import androidx.work.Constraints
-import androidx.work.OneTimeWorkRequest
-import androidx.work.PeriodicWorkRequest
-import androidx.work.WorkManager
+import androidx.work.*
 import com.b4motion.geolocation.data.Repository
 import com.b4motion.geolocation.data.storage.GeoDatabase
+import com.b4motion.geolocation.geolocation.globals.extensions.log
 import com.b4motion.geolocation.geolocation.usescase.geo.ServiceRequestLocation
 import com.b4motion.geolocation.geolocation.usescase.geo.WorkerLocation
 import java.util.concurrent.TimeUnit
@@ -43,6 +41,7 @@ class GeoB4 {
      * @throws SecurityException if ACCESS_FINE_LOCATION and READ_PHONE_STATE permissions aren't given
      */
     fun init(activity: AppCompatActivity, mobileId: String) {
+        log("init geo b4")
         database = Room.databaseBuilder(activity, GeoDatabase::class.java, "b4_geo_database").fallbackToDestructiveMigration().build()
         if (hasPermissions(activity)) {
             Repository.setMobileId(activity, mobileId)
@@ -51,10 +50,15 @@ class GeoB4 {
             val workerLocation =
                     OneTimeWorkRequest.Builder(WorkerLocation::class.java)
 
-
-            workerLocation.addTag("workerLocation")
+            //workerLocation.addTag("workerLocation")
 
             WorkManager.getInstance().enqueue(workerLocation.build())
+           /* WorkManager.getInstance().beginUniqueWork(
+                    "workerLocation",
+                    ExistingWorkPolicy.REPLACE,
+                    workerLocation.build()
+            ).enqueue()*/
+            log("init worker en init de GeoB4")
 
         } else
             throw(SecurityException())

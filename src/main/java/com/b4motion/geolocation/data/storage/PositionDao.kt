@@ -17,7 +17,7 @@ interface PositionDao {
     @Delete
     fun delete(position: PositionDb)
 
-    @Delete
-    fun delete(positions : MutableList<PositionDb> = getAllPositionsAsc())
+    @Query("DELETE FROM positions")
+    fun delete()
 
 }
