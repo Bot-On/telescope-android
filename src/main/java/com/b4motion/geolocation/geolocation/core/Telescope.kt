@@ -46,7 +46,7 @@ class Telescope {
         }
 
         @JvmStatic
-        fun restartTracking(activity: AppCompatActivity) {
+        fun restartTracking() {
             if (telescope != null) {
 
                 locationWait = CountDownLatch(1)
@@ -63,7 +63,7 @@ class Telescope {
 
 
         @JvmStatic
-        fun stopTracking(activity: AppCompatActivity) {
+        fun stopTracking() {
             //activity.applicationContext.stopService(Intent(activity, ServiceRequestLocation::class.java))
             isRunning = false
 
