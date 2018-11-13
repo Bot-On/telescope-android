@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import com.b4motion.geolocation.data.Repository
 import com.b4motion.geolocation.data.cloud.ConnectionManager
 import com.b4motion.geolocation.geolocation.globals.extensions.getTelescopeInfo
 import com.b4motion.geolocation.geolocation.globals.extensions.log
@@ -36,9 +37,10 @@ class Telescope {
         fun getInstance(activity: AppCompatActivity, imei: String): Telescope {
             if (telescope == null) {
                 if (checkPermissions(activity)) {
-                    GeoB4.getInstance().init(activity, imei)
+                    Repository.setMobileId(activity, imei)
                     isRunning = true
                     telescope = Telescope()
+                    restartTracking()
                 }
             }
             Stetho.initializeWithDefaults(activity)

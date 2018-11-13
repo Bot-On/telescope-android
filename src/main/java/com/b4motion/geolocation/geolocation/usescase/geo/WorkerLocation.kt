@@ -3,21 +3,14 @@ package com.b4motion.geolocation.geolocation.usescase.geo
 import android.annotation.SuppressLint
 import android.arch.persistence.room.Room
 import android.content.Context
-import android.content.Intent
 import android.location.Location
 import android.os.HandlerThread
-import android.os.Looper
-import android.provider.Settings
-import android.support.v4.app.ActivityCompat.startActivity
-import android.support.v4.app.ActivityCompat.startActivityForResult
-import android.support.v4.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.b4motion.geolocation.data.Repository
 import com.b4motion.geolocation.data.cloud.ConnectionManager
 import com.b4motion.geolocation.data.storage.GeoDatabase
 import com.b4motion.geolocation.domain.db.PositionDb
-import com.b4motion.geolocation.geolocation.core.GeoB4
 import com.b4motion.geolocation.geolocation.core.Telescope
 import com.b4motion.geolocation.geolocation.globals.extensions.getTelescopeInfo
 import com.b4motion.geolocation.geolocation.globals.extensions.log
@@ -25,7 +18,6 @@ import com.b4motion.geolocation.geolocation.globals.extensions.toRequestFeedGPS
 import com.google.android.gms.location.*
 import io.reactivex.disposables.CompositeDisposable
 import org.jetbrains.anko.doAsync
-import java.util.concurrent.CountDownLatch
 
 
 /**
@@ -94,14 +86,27 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
                             lastLocation.longitude,
                             lastLocation.altitude,
                             lastLocation.bearing.toDouble(),
-                            lastLocation.speed.toDouble())
+                            getSpeed(lastLocation))
                     log("send position")
+                    lastLocationSaved = lastLocation
                     sendLocations(position)
                 }
             }
         }
     }
 
+    private fun getSpeed(currentLocation: Location): Double {
+        return if (currentLocation.speed > 0)
+            currentLocation.speed.toDouble()
+        else {
+            var speed = 0.0
+            if (lastLocationSaved != null)
+                speed = lastLocationSaved!!.distanceTo(currentLocation) /
+                        ((currentLocation.time - lastLocationSaved!!.time).toDouble() / 1000)
+            log("speed: $speed")
+            speed
+        }
+    }
 
     private fun sendLocations(position: PositionDb) {
         doAsync {

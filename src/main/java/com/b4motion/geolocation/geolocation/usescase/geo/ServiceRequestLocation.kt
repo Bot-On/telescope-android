@@ -12,10 +12,7 @@ import android.support.v4.app.NotificationCompat
 import com.b4motion.geolocation.data.Repository
 import com.b4motion.geolocation.domain.db.PositionDb
 import com.b4motion.geolocation.geolocation.R
-import com.b4motion.geolocation.geolocation.core.GeoB4
 import com.b4motion.geolocation.geolocation.globals.extensions.buildNotificationChanel
-import com.b4motion.geolocation.geolocation.globals.extensions.log
-import com.b4motion.geolocation.geolocation.globals.extensions.toRequestFeedGPS
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
 import io.reactivex.disposables.CompositeDisposable
