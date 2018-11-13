@@ -18,14 +18,14 @@ class ConnectionManager {
 
     companion object {
 
-        private lateinit var retrofit : Retrofit
+        private lateinit var telescopeRetrofit : Retrofit
 
         fun initRetrofitClient(telescope: Telescope){
-            retrofit = RetrofitClient.getClient(telescope)
+            telescopeRetrofit = RetrofitClient.getClient(telescope)
         }
 
         fun sendGPSData(position: RequestFeedGPS) : Completable {
-            return retrofit
+            return telescopeRetrofit
                     .create(Services::class.java)
                     .sendGPSData(position)
                     .subscribeOn(Schedulers.io())
@@ -33,7 +33,7 @@ class ConnectionManager {
         }
 
         fun getDeviceId(mobile_id : String) : Single<TelescopeResponse<MutableList<Device>>> {
-            return retrofit
+            return telescopeRetrofit
                     .create(Services::class.java)
                     .getDeviceId(mobile_id)
                     .subscribeOn(Schedulers.io())
@@ -41,7 +41,7 @@ class ConnectionManager {
         }
 
         fun createDevice(imei : String) : Single<TelescopeResponse<Device>> {
-            return retrofit
+            return telescopeRetrofit
                     .create(Services::class.java)
                     .createDevice(imei)
                     .subscribeOn(Schedulers.io())

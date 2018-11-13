@@ -76,18 +76,18 @@ class ServiceRequestLocation : Service() {
 
 
         doAsync {
-            GeoB4.getInstance().database.poistionDao().insertPosition(position)
+            /*GeoB4.getInstance().database.poistionDao().insertPosition(position)
             disposable.add(
                     Repository.sendGPSData(GeoB4.getInstance().database.poistionDao().getAllPositionsAsc().toRequestFeedGPS())
                             .subscribe({ deletePosition() }, { log("Error", "GeoLocation") })
-            )
+            )*/
         }
     }
 
     private fun deletePosition() {
-        doAsync {
+        /*doAsync {
             GeoB4.getInstance().database.poistionDao().delete()
-        }
+        }*/
     }
 
     private fun buildLocationRequest() {

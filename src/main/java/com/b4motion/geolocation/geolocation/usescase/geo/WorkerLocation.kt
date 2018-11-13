@@ -1,16 +1,25 @@
 package com.b4motion.geolocation.geolocation.usescase.geo
 
 import android.annotation.SuppressLint
+import android.arch.persistence.room.Room
 import android.content.Context
+import android.content.Intent
 import android.location.Location
 import android.os.HandlerThread
 import android.os.Looper
+import android.provider.Settings
+import android.support.v4.app.ActivityCompat.startActivity
+import android.support.v4.app.ActivityCompat.startActivityForResult
+import android.support.v4.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.b4motion.geolocation.data.Repository
+import com.b4motion.geolocation.data.cloud.ConnectionManager
+import com.b4motion.geolocation.data.storage.GeoDatabase
 import com.b4motion.geolocation.domain.db.PositionDb
 import com.b4motion.geolocation.geolocation.core.GeoB4
 import com.b4motion.geolocation.geolocation.core.Telescope
+import com.b4motion.geolocation.geolocation.globals.extensions.getTelescopeInfo
 import com.b4motion.geolocation.geolocation.globals.extensions.log
 import com.b4motion.geolocation.geolocation.globals.extensions.toRequestFeedGPS
 import com.google.android.gms.location.*
@@ -34,12 +43,18 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
     private val disposable: CompositeDisposable = CompositeDisposable()
     private lateinit var locationCallback: LocationCallback
     private var lastLocationSaved: Location? = null
+    lateinit var database: GeoDatabase
 
 
     //------------ WORKER METHODS ---------------------
     //region WORKER METHODS
     @SuppressLint("MissingPermission")
     override fun doWork(): Result {
+        if (!::database.isInitialized)
+            database = Room.databaseBuilder(context, GeoDatabase::class.java, "b4_geo_database").fallbackToDestructiveMigration().build()
+
+        ConnectionManager.initRetrofitClient(context.applicationContext.getTelescopeInfo())
+
         log("doWork")
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         //val lastLocation = fusedLocationClient.lastLocation.result
@@ -73,26 +88,28 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
                 super.onLocationResult(p0)
                 log("positionreceived ${p0?.lastLocation?.latitude} : ${p0?.lastLocation?.longitude} : ${p0?.lastLocation?.time}")
                 if (p0 != null) {
-                        val lastLocation = p0.lastLocation
-                        val position = PositionDb(System.currentTimeMillis(), Repository.getMobileId(context),
-                                lastLocation.latitude,
-                                lastLocation.longitude,
-                                lastLocation.altitude,
-                                lastLocation.bearing.toDouble(),
-                                lastLocation.speed.toDouble())
-                        log("send position")
-                        sendLocations(position)
-                    }
+                    val lastLocation = p0.lastLocation
+                    val position = PositionDb(System.currentTimeMillis(), Repository.getMobileId(context),
+                            lastLocation.latitude,
+                            lastLocation.longitude,
+                            lastLocation.altitude,
+                            lastLocation.bearing.toDouble(),
+                            lastLocation.speed.toDouble())
+                    log("send position")
+                    sendLocations(position)
                 }
             }
         }
+    }
 
 
     private fun sendLocations(position: PositionDb) {
         doAsync {
-            GeoB4.getInstance().database.poistionDao().insertPosition(position)
+            ConnectionManager.initRetrofitClient(context.applicationContext.getTelescopeInfo())
+
+            database.poistionDao().insertPosition(position)
             disposable.add(
-                    Repository.sendGPSData(GeoB4.getInstance().database.poistionDao().getAllPositionsAsc().toRequestFeedGPS())
+                    Repository.sendGPSData(database.poistionDao().getAllPositionsAsc().toRequestFeedGPS())
                             .subscribe({ deletePosition() }, { connectionError() })
             )
         }
@@ -116,7 +133,7 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
     private fun deletePosition() {
         log("removing position")
         doAsync {
-            GeoB4.getInstance().database.poistionDao().delete()
+            database.poistionDao().delete()
             //locationWait.countDown()
         }
     }

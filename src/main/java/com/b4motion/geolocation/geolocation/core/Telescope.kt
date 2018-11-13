@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.b4motion.geolocation.data.cloud.ConnectionManager
@@ -35,7 +36,6 @@ class Telescope {
         fun getInstance(activity: AppCompatActivity, imei: String): Telescope {
             if (telescope == null) {
                 if (checkPermissions(activity)) {
-                    ConnectionManager.initRetrofitClient(activity.applicationContext.getTelescopeInfo())
                     GeoB4.getInstance().init(activity, imei)
                     isRunning = true
                     telescope = Telescope()
@@ -50,14 +50,10 @@ class Telescope {
             if (telescope != null) {
 
                 locationWait = CountDownLatch(1)
-
-                val workerLocation =
-                        OneTimeWorkRequest.Builder(WorkerLocation::class.java)
-
-
-                workerLocation.addTag("workerLocation")
-
-                WorkManager.getInstance().enqueue(workerLocation.build())
+                WorkManager.getInstance().beginUniqueWork("worklocation",
+                        ExistingWorkPolicy.KEEP,
+                        OneTimeWorkRequest.Builder(WorkerLocation::class.java).build())
+                        .enqueue()
 
                 log("restarting tracking")
                 isRunning = true

@@ -16,7 +16,7 @@ import com.b4motion.geolocation.geolocation.usescase.geo.WorkerLocation
 import java.util.concurrent.TimeUnit
 
 class GeoB4 {
-    lateinit var database: GeoDatabase
+    //lateinit var database: GeoDatabase
 
     companion object Factory {
         private var geoB4: GeoB4? = null
@@ -42,22 +42,22 @@ class GeoB4 {
      */
     fun init(activity: AppCompatActivity, mobileId: String) {
         log("init geo b4")
-        database = Room.databaseBuilder(activity, GeoDatabase::class.java, "b4_geo_database").fallbackToDestructiveMigration().build()
+        //database = Room.databaseBuilder(activity, GeoDatabase::class.java, "b4_geo_database").fallbackToDestructiveMigration().build()
         if (hasPermissions(activity)) {
             Repository.setMobileId(activity, mobileId)
             //activity.startService(Intent(activity, ServiceRequestLocation::class.java))
 
-            val workerLocation =
-                    OneTimeWorkRequest.Builder(WorkerLocation::class.java)
-
             //workerLocation.addTag("workerLocation")
 
-            WorkManager.getInstance().enqueue(workerLocation.build())
-           /* WorkManager.getInstance().beginUniqueWork(
-                    "workerLocation",
-                    ExistingWorkPolicy.REPLACE,
-                    workerLocation.build()
-            ).enqueue()*/
+            WorkManager.getInstance().beginUniqueWork("worklocation",
+                    ExistingWorkPolicy.KEEP,
+                    OneTimeWorkRequest.Builder(WorkerLocation::class.java).build())
+                    .enqueue()
+            /* WorkManager.getInstance().beginUniqueWork(
+                     "workerLocation",
+                     ExistingWorkPolicy.REPLACE,
+                     workerLocation.build()
+             ).enqueue()*/
             log("init worker en init de GeoB4")
 
         } else
