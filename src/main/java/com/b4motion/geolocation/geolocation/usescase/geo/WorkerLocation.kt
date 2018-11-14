@@ -81,7 +81,8 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
                 log("positionreceived ${p0?.lastLocation?.latitude} : ${p0?.lastLocation?.longitude} : ${p0?.lastLocation?.time}")
                 if (p0 != null) {
                     val lastLocation = p0.lastLocation
-                    val position = PositionDb(System.currentTimeMillis(), Repository.getMobileId(context),
+                    val position = PositionDb(p0.lastLocation.time,
+                            Repository.getMobileId(context),
                             lastLocation.latitude,
                             lastLocation.longitude,
                             lastLocation.altitude,

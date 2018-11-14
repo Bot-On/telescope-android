@@ -11,5 +11,5 @@ import com.b4motion.geolocation.domain.model.RequestFeedGPS
  * jcamarero@quadram.mobi
  */
 fun MutableList<PositionDb>.toRequestFeedGPS() = RequestFeedGPS(this[this.size - 1].deviceId, this.map {
-    com.b4motion.geolocation.domain.model.PositionFeedGPS(it.timestamp.toDouble(), it.latitude, it.longitude, it.altitude, it.bearing, it.speed)
+    com.b4motion.geolocation.domain.model.PositionFeedGPS(it.timestamp.toZuluFormat(), it.latitude, it.longitude, it.altitude, it.bearing, it.speed)
 } as MutableList<PositionFeedGPS>)

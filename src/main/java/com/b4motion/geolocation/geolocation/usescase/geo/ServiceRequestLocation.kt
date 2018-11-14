@@ -13,6 +13,7 @@ import com.b4motion.geolocation.data.Repository
 import com.b4motion.geolocation.domain.db.PositionDb
 import com.b4motion.geolocation.geolocation.R
 import com.b4motion.geolocation.geolocation.globals.extensions.buildNotificationChanel
+import com.b4motion.geolocation.geolocation.globals.extensions.toZuluFormat
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationServices.getFusedLocationProviderClient
 import io.reactivex.disposables.CompositeDisposable
@@ -64,7 +65,8 @@ class ServiceRequestLocation : Service() {
     }
 
     private fun onLocationChanged(location: Location) {
-        position = PositionDb(System.currentTimeMillis(), Repository.getMobileId(this),
+        position = PositionDb(location.time,
+                Repository.getMobileId(this),
                 location.latitude,
                 location.longitude,
                 location.altitude,
