@@ -15,7 +15,7 @@ import com.b4motion.geolocation.geolocation.globals.extensions.getTelescopeInfo
 import com.b4motion.geolocation.geolocation.globals.extensions.log
 import com.b4motion.geolocation.geolocation.usescase.geo.ServiceRequestLocation
 import com.b4motion.geolocation.geolocation.usescase.geo.WorkerLocation
-import com.facebook.stetho.Stetho
+/*import com.facebook.stetho.Stetho*/
 import java.util.concurrent.CountDownLatch
 
 
@@ -43,7 +43,7 @@ class Telescope {
                     restartTracking()
                 }
             }
-            Stetho.initializeWithDefaults(activity)
+//            Stetho.initializeWithDefaults(activity)
             return telescope ?: getInstance(activity, imei)
         }
 
