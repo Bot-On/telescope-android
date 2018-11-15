@@ -6,4 +6,4 @@ package com.b4motion.geolocation.geolocation.globals.constants
  * QUADRAM MOBILE SOLUTIONS
  * jcamarero@quadram.mobi
  */
-const val DATE_ZULU_FORMAT = "yyyy-MM-dd'T'H:mm:ss.SSS'Z'"
+const val DATE_ZULU_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
