@@ -2,6 +2,7 @@ package com.b4motion.geolocation.geolocation.globals.extensions
 
 import com.b4motion.geolocation.domain.db.PositionDb
 import com.b4motion.geolocation.domain.model.PositionFeedGPS
+import com.b4motion.geolocation.domain.model.PositionGPS
 import com.b4motion.geolocation.domain.model.RequestFeedGPS
 
 
@@ -10,6 +11,9 @@ import com.b4motion.geolocation.domain.model.RequestFeedGPS
  * QUADRAM MOBILE SOLUTIONS
  * jcamarero@quadram.mobi
  */
-fun MutableList<PositionDb>.toRequestFeedGPS() = RequestFeedGPS(this[this.size - 1].deviceId, this.map {
-    com.b4motion.geolocation.domain.model.PositionFeedGPS(it.timestamp.toZuluFormat(), it.latitude, it.longitude, it.altitude, it.bearing, it.speed)
-} as MutableList<PositionFeedGPS>)
+fun MutableList<PositionDb>.toRequestFeedGPS() = RequestFeedGPS(this[this.size - 1].deviceId,
+        this.map {
+            com.b4motion.geolocation.domain.model.PositionFeedGPS(it.timestamp.toZuluFormat(), it.latitude, it.longitude, it.altitude, it.bearing, it.speed)
+        } as MutableList<PositionFeedGPS>,
+        PositionGPS(this.last().latitude, this.last().longitude, this.last().altitude
+        ))

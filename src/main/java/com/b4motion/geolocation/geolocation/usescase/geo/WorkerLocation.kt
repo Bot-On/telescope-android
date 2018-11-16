@@ -5,6 +5,7 @@ import android.arch.persistence.room.Room
 import android.content.Context
 import android.location.Location
 import android.os.HandlerThread
+import android.widget.Toast
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.b4motion.geolocation.data.Repository
@@ -29,6 +30,7 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
     companion object {
         const val LOCATION_REFRESH_TIME = 5000L
         const val LOCATION_REFRESH_DISTANCE = 1f
+        const val MINIMUN_POSITIONS_TO_SEND = 5
     }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -78,6 +80,7 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult?) {
                 super.onLocationResult(p0)
+                Toast.makeText(context, "Position Received", Toast.LENGTH_LONG)
                 log("positionreceived ${p0?.lastLocation?.latitude} : ${p0?.lastLocation?.longitude} : ${p0?.lastLocation?.time}")
                 if (p0 != null) {
                     val lastLocation = p0.lastLocation
@@ -114,10 +117,11 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
             ConnectionManager.initRetrofitClient(context.applicationContext.getTelescopeInfo())
 
             database.poistionDao().insertPosition(position)
-            disposable.add(
-                    Repository.sendGPSData(database.poistionDao().getAllPositionsAsc().toRequestFeedGPS())
-                            .subscribe({ deletePosition() }, { connectionError() })
-            )
+            if (database.poistionDao().getAllPositionsAsc().size > MINIMUN_POSITIONS_TO_SEND)
+                disposable.add(
+                        Repository.sendGPSData(database.poistionDao().getAllPositionsAsc().toRequestFeedGPS())
+                                .subscribe({ deletePosition() }, { connectionError() })
+                )
         }
     }
 

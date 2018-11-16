@@ -10,5 +10,9 @@ import java.util.*
  * QUADRAM MOBILE SOLUTIONS
  * jcamarero@quadram.mobi
  */
-fun Long.toZuluFormat(): String = SimpleDateFormat(DATE_ZULU_FORMAT, Locale.getDefault()).format(this)
+fun Long.toZuluFormat(): String {
+    val formater = SimpleDateFormat(DATE_ZULU_FORMAT, Locale.getDefault())
+    formater.timeZone = TimeZone.getTimeZone("UTC")
+    return formater.format(this)
+}
 
