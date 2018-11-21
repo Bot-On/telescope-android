@@ -1,7 +1,7 @@
 package com.b4motion.geolocation.geolocation.core
 
+/*import com.facebook.stetho.Stetho*/
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -10,12 +10,9 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.b4motion.geolocation.data.Repository
-import com.b4motion.geolocation.data.cloud.ConnectionManager
-import com.b4motion.geolocation.geolocation.globals.extensions.getTelescopeInfo
 import com.b4motion.geolocation.geolocation.globals.extensions.log
-import com.b4motion.geolocation.geolocation.usescase.geo.ServiceRequestLocation
 import com.b4motion.geolocation.geolocation.usescase.geo.WorkerLocation
-/*import com.facebook.stetho.Stetho*/
+import com.facebook.stetho.Stetho
 import java.util.concurrent.CountDownLatch
 
 
@@ -30,11 +27,13 @@ class Telescope {
 
         private var telescope: Telescope? = null
         private var isRunning: Boolean = false
+        var isLogEnabled = false
         var locationWait = CountDownLatch(1)
 
 
         @JvmStatic
-        fun getInstance(activity: AppCompatActivity, imei: String): Telescope {
+        fun getInstance(activity: AppCompatActivity, imei: String, enableLog: Boolean = false): Telescope {
+            isLogEnabled = enableLog
             if (telescope == null) {
                 if (checkPermissions(activity)) {
                     Repository.setMobileId(activity, imei)
@@ -43,21 +42,20 @@ class Telescope {
                     restartTracking()
                 }
             }
-//            Stetho.initializeWithDefaults(activity)
+            Stetho.initializeWithDefaults(activity)
             return telescope ?: getInstance(activity, imei)
         }
 
         @JvmStatic
         fun restartTracking() {
             if (telescope != null) {
-
                 locationWait = CountDownLatch(1)
                 WorkManager.getInstance().beginUniqueWork("worklocation",
-                        ExistingWorkPolicy.KEEP,
+                        ExistingWorkPolicy.REPLACE,
                         OneTimeWorkRequest.Builder(WorkerLocation::class.java).build())
                         .enqueue()
 
-                log("restarting tracking")
+                log("starting tracking")
                 isRunning = true
             } else
                 throw Exception("you have to call Telescope.getInstance(activity, imei) first")
@@ -66,9 +64,7 @@ class Telescope {
 
         @JvmStatic
         fun stopTracking() {
-            //activity.applicationContext.stopService(Intent(activity, ServiceRequestLocation::class.java))
             isRunning = false
-
             locationWait.countDown()
         }
 

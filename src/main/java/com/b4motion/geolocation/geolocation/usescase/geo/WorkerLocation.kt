@@ -4,8 +4,7 @@ import android.annotation.SuppressLint
 import android.arch.persistence.room.Room
 import android.content.Context
 import android.location.Location
-import android.os.HandlerThread
-import android.widget.Toast
+import android.os.Looper
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.b4motion.geolocation.data.Repository
@@ -42,27 +41,16 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
 
     //------------ WORKER METHODS ---------------------
     //region WORKER METHODS
-    @SuppressLint("MissingPermission")
     override fun doWork(): Result {
+        log("starting location work")
         if (!::database.isInitialized)
             database = Room.databaseBuilder(context, GeoDatabase::class.java, "b4_geo_database").fallbackToDestructiveMigration().build()
 
         ConnectionManager.initRetrofitClient(context.applicationContext.getTelescopeInfo())
 
-        log("doWork")
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-        //val lastLocation = fusedLocationClient.lastLocation.result
-        defineLocationListener()
+        startToLocate()
 
-        var handlerThread = HandlerThread("MyHandlerThread")
-        handlerThread.start()
-        var looper = handlerThread.looper
-        fusedLocationClient.requestLocationUpdates(buildLocationRequest(), locationCallback, looper)
-
-        log("location wait")
-        log("location count ${Telescope.locationWait.await()}")
         Telescope.locationWait.await()
-        log("location released")
         return Result.SUCCESS
     }
 
@@ -70,33 +58,44 @@ class WorkerLocation(val context: Context, workerParams: WorkerParameters) : Wor
         super.onStopped(cancelled)
         log("on stop work location")
         disposable.dispose()
-        fusedLocationClient.removeLocationUpdates(locationCallback)
+        if (::fusedLocationClient.isInitialized)
+            fusedLocationClient.removeLocationUpdates(locationCallback)
+
     }
     //endregion
 
     //------------ UTILS ---------------------
     //region UTILS
-    private fun defineLocationListener() {
+    @SuppressLint("MissingPermission")
+    private fun startToLocate() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context.applicationContext)
+        //val lastLocation = fusedLocationClient.lastLocation.result
+        defineFusedLocationListener()
+        fusedLocationClient.requestLocationUpdates(buildLocationRequest(), locationCallback, Looper.getMainLooper())
+    }
+
+    private fun defineFusedLocationListener() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult?) {
                 super.onLocationResult(p0)
-                Toast.makeText(context, "Position Received", Toast.LENGTH_LONG)
                 log("positionreceived ${p0?.lastLocation?.latitude} : ${p0?.lastLocation?.longitude} : ${p0?.lastLocation?.time}")
-                if (p0 != null) {
-                    val lastLocation = p0.lastLocation
-                    val position = PositionDb(p0.lastLocation.time,
-                            Repository.getMobileId(context),
-                            lastLocation.latitude,
-                            lastLocation.longitude,
-                            lastLocation.altitude,
-                            lastLocation.bearing.toDouble(),
-                            getSpeed(lastLocation))
-                    log("send position")
-                    lastLocationSaved = lastLocation
-                    sendLocations(position)
-                }
+                if (p0 != null)
+                    handleLocation(p0.lastLocation)
             }
         }
+    }
+
+    private fun handleLocation(location: Location) {
+        val position = PositionDb(location.time,
+                Repository.getMobileId(context),
+                location.latitude,
+                location.longitude,
+                location.altitude,
+                location.bearing.toDouble(),
+                getSpeed(location))
+        log("send position")
+        lastLocationSaved = location
+        sendLocations(position)
     }
 
     private fun getSpeed(currentLocation: Location): Double {
